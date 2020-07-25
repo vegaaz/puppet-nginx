@@ -70,7 +70,6 @@
 #        - key: '*.nyc.example.com'
 #          value: 'ny-pool-1'
 
-
 define nginx::resource::map (
   String[2] $string,
   Variant[Array, Hash] $mappings,

@@ -196,7 +196,7 @@ define nginx::resource::server (
   Enum['on', 'off'] $spdy                                                        = $nginx::spdy,
   Enum['on', 'off'] $http2                                                       = $nginx::http2,
   Optional[String] $proxy                                                        = undef,
-  Optional[String]$proxy_redirect                                                = undef,
+  Optional[String] $proxy_redirect                                               = undef,
   String $proxy_read_timeout                                                     = $nginx::proxy_read_timeout,
   String $proxy_send_timeout                                                     = $nginx::proxy_send_timeout,
   $proxy_connect_timeout                                                         = $nginx::proxy_connect_timeout,
@@ -227,7 +227,7 @@ define nginx::resource::server (
   Array $index_files                                                             = [
     'index.html',
     'index.htm',
-    'index.php'],
+  'index.php'],
   Optional[String] $autoindex                                                    = undef,
   Optional[Enum['on', 'off']] $autoindex_exact_size                              = undef,
   Optional[Enum['html', 'xml', 'json', 'jsonp']] $autoindex_format               = undef,
@@ -281,7 +281,6 @@ define nginx::resource::server (
   Hash $locations                                                                = {},
   Hash $locations_defaults                                                       = {},
 ) {
-
   if ! defined(Class['nginx']) {
     fail('You must include the nginx base class before using any defined resources')
   }
@@ -365,7 +364,7 @@ define nginx::resource::server (
   # ssl redirect and no ssl -> false
   if (!$ssl_redirect or $ssl) and $use_default_location {
     # Create the default location reference for the server
-    nginx::resource::location {"${name_sanitized}-default":
+    nginx::resource::location { "${name_sanitized}-default":
       ensure                      => $ensure,
       server                      => $name_sanitized,
       ssl                         => $ssl,
@@ -429,7 +428,7 @@ define nginx::resource::server (
 
   if $fastcgi != undef and !defined(File[$fastcgi_params]) and $fastcgi_params == "${nginx::conf_dir}/fastcgi.conf" {
     file { $fastcgi_params:
-      ensure  => present,
+      ensure  => file,
       mode    => '0644',
       content => template('nginx/server/fastcgi.conf.erb'),
     }
@@ -437,7 +436,7 @@ define nginx::resource::server (
 
   if $uwsgi != undef and !defined(File[$uwsgi_params]) and $uwsgi_params == "${nginx::conf_dir}/uwsgi_params" {
     file { $uwsgi_params:
-      ensure  => present,
+      ensure  => file,
       mode    => '0644',
       content => template('nginx/server/uwsgi_params.erb'),
     }
@@ -476,7 +475,7 @@ define nginx::resource::server (
   }
 
   unless $nginx::confd_only {
-    file{ "${name_sanitized}.conf symlink":
+    file { "${name_sanitized}.conf symlink":
       ensure  => $server_symlink_ensure,
       path    => "${server_enable_dir}/${name_sanitized}.conf",
       target  => $config_file,
@@ -488,10 +487,10 @@ define nginx::resource::server (
   create_resources('::nginx::resource::map', $string_mappings)
   create_resources('::nginx::resource::geo', $geo_mappings)
   create_resources('::nginx::resource::location', $locations, {
-    ensure   => $ensure,
-    server   => $name_sanitized,
-    ssl      => $ssl,
-    ssl_only => $ssl_only,
-    www_root => $www_root,
+      ensure   => $ensure,
+      server   => $name_sanitized,
+      ssl      => $ssl,
+      ssl_only => $ssl_only,
+      www_root => $www_root,
   } + $locations_defaults)
 }
